@@ -1,24 +1,82 @@
 # Kanal::Plugins::BatteriesBridge
 
-TODO: Delete this and the text below, and describe your gem
+### BatteriesBridge plugin provides the bridge between different interfaces with their properties to the batteries plugin properties.
+E.g.: if you use telegram interface and have `input.tg_text` - this plugin will convert it into `input.body` (body property provided by the batteries plugin)
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/kanal/plugins/batteries_bridge`. To experiment with that code, run `bin/console` for an interactive prompt.
+### Where to find Batteries plugin? Well, as of right now, Batteries plugin is a part of Kanal core codebase, part of it's repository. If you have Kanal core library -
+you can get plugin via Kanal::Plugins::Batteries::BatteriesPlugin
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
-
 Install the gem and add to the application's Gemfile by executing:
 
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+    $ bundle add kanal-plugins-batteries_bridge
 
 If bundler is not being used to manage dependencies, install the gem by executing:
 
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+    $ gem install kanal-plugins-batteries_bridge
 
 ## Usage
 
-TODO: Write usage instructions here
+1. Create instance of plugin:
+
+```rb
+plugin = Kanal::Plugins::BatteriesBridge::BatteriesBridge.new
+```
+
+2. Include needed bridges:
+
+```rb
+plugin.add_telegram # This adds built in default Telegram bridge
+
+plugin.add_bridge YourBridgeClass.new
+```
+
+3. Register plugin: 
+
+```rb
+core.register_plugin plugin
+```
+
+## Build-in bridges
+
+- Telegram: `plugin.add_telegram`
+
+## Creating bridge:
+
+```rb
+# WARNING: don't forget that all used input/output properties should be registered!
+
+class YourBridgeClass < Kanal::Plugins::BatteriesBridge::Bridges::Bridge
+  # Required method that will be used
+  def setup
+    # This line is required, you should specify which .source is needed for this bridge to work
+    # Some info about input parameter :source - Batteries plugin introduced this parameter and ALL
+    # interfaces should populate .source input parameter when creating input. Thanks to this we can determine whether
+    # input came from telegram, or facebook messenger or some other source.
+    require_source :my_messenger_source
+
+    # Here with handy DSL methods you can specify which parameters to convert
+    input_convert :input_parameter_to_convert, :input_parameter_that_will_be_populated do |value_of_input_parameter|
+      # You can do anything with provided value here and return changed value, or return unchanged value for the sake of
+      # just populating different input property
+      your_changed_value
+    end
+
+    input_convert :float_param, :int_param do |value|
+      value.to_i
+    end
+
+    output_convert :from_param, :to_param do |value|
+      value
+    end
+
+    # You can specify as many convertations as you like
+  end
+end
+
+plugin.add_bridge YourBridgeClass.new
+```
 
 ## Development
 
@@ -28,7 +86,9 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/kanal-plugins-batteries_bridge. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/kanal-plugins-batteries_bridge/blob/main/CODE_OF_CONDUCT.md).
+### If there is interface without bridge for batteries out there - we will be grateful if you contribute new bridge!
+
+Bug reports and pull requests are welcome on GitHub at https://github.com/idchlife/kanal-plugins-batteries_bridge. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/idchlife/kanal-plugins-batteries_bridge/blob/main/CODE_OF_CONDUCT.md).
 
 ## License
 
@@ -36,4 +96,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Kanal::Plugins::BatteriesBridge project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/kanal-plugins-batteries_bridge/blob/main/CODE_OF_CONDUCT.md).
+Everyone interacting in the Kanal::Plugins::BatteriesBridge project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/idchlife/kanal-plugins-batteries_bridge/blob/main/CODE_OF_CONDUCT.md).

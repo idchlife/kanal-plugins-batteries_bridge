@@ -13,18 +13,38 @@ module Kanal
         include Kanal::Core::Logging
         include Bridges
 
-        def initialize(bridges: [])
+        def initialize
           super
 
-          @available_bridges = {
-            telegram: TelegramBridge
-          }
-
-          @bridges_to_register = bridges
+          @bridges = []
         end
 
         def name
           :batteries_bridge
+        end
+
+        #
+        # @param [Bridge] bridge <description>
+        #
+        # @return [BatteriesBridgePlugin] <description>
+        #
+        def add_bridge(bridge)
+          raise "bridge should be instance of a Bridge class" unless bridge.is_a? Bridge
+
+          return if @bridges.include? bridge
+
+          @bridges << bridge
+          self
+        end
+
+        #
+        # <Description>
+        #
+        # @return [BatteriesBridgePlugin] <description>
+        #
+        def add_telegram
+          add_bridge TelegramBridge.new
+          self
         end
 
         #
@@ -34,29 +54,12 @@ module Kanal
         #
         def setup(core)
           unless core.plugin_registered? :batteries
-            logger.error "[Kanal::Plugins::BatteriesBridge::BatteriesBridgePlugin]: cannot register plugin because :batteries plugin is not (maybe yet) registered in the core. It is required"
-            return
+            raise "[Kanal::Plugins::BatteriesBridge::BatteriesBridgePlugin]: cannot register plugin because :batteries plugin is not (maybe yet) registered in the core. It is required"
           end
 
-          @bridges_to_register.each do |bridge_symbol|
-            bridge = bridge_for_symbol bridge_symbol, core.hooks
-
-            bridge.setup
+          @bridges.each do |b|
+            b.send("internal_setup", core.hooks)
           end
-        end
-
-        #
-        # <Description>
-        #
-        # @param [Symbol] bridge_symbol <description>
-        # @param [Kanal::Core::Hooks::HookStorage] core_hooks <description>
-        #
-        # @return [Kanal::Plugins::BatteriesBridge::Bridges::Bridge] <description>
-        #
-        def bridge_for_symbol(bridge_symbol, core_hooks)
-          raise "Cannot find bridge for #{bridge_symbol}" unless @available_bridges.key? bridge_symbol
-
-          @available_bridges[bridge_symbol].new core_hooks
         end
       end
     end

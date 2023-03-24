@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "kanal"
+require "kanal/plugins/batteries/attachments/attachment"
 require_relative "./bridge"
 
 module Kanal

@@ -106,48 +106,59 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::BatteriesBridgePlugin do
     expect(output.baked_output_prop).to eq "val123_output"
   end
 
-  # it "calls only suited :source bridges" do
-  #   core = Kanal::Core::Core.new
+  it "calls only suited :source bridges" do
+    core = Kanal::Core::Core.new
 
-  #   core.register_input_parameter :raw_input_prop
-  #   core.register_input_parameter :baked_input_prop
+    core.register_input_parameter :raw_input_prop
+    core.register_input_parameter :baked_input_prop
+    core.register_input_parameter :forbidden_input_prop
 
-  #   core.register_output_parameter :raw_output_prop
-  #   core.register_output_parameter :baked_output_prop
+    core.register_output_parameter :raw_output_prop
+    core.register_output_parameter :baked_output_prop
+    core.register_output_parameter :forbidden_output_prop
 
-  #   core.router.default_response do
-  #     body "Default response"
-  #   end
+    core.router.default_response do
+      body "Default response"
+    end
 
-  #   core.register_plugin Kanal::Plugins::Batteries::BatteriesPlugin.new
+    core.register_plugin Kanal::Plugins::Batteries::BatteriesPlugin.new
 
-  #   bb_plugin = Kanal::Plugins::BatteriesBridge::BatteriesBridgePlugin.new
+    bb_plugin = Kanal::Plugins::BatteriesBridge::BatteriesBridgePlugin.new
 
-  #   bb_plugin.add_bridge IntegrationTestBridge.new
-  #   bb_plugin.add_bridge IntegrationTestBridgeToAvoid.new
+    bb_plugin.add_bridge IntegrationTestBridge.new
+    bb_plugin.add_bridge IntegrationTestBridgeToAvoid.new
 
-  #   core.register_plugin bb_plugin
+    core.register_plugin bb_plugin
 
-  #   core.router.configure do
-  #     on :flow, :any do
-  #       respond do
-  #         body "Something something"
-  #       end
-  #     end
-  #   end
+    core.router.configure do
+      on :flow, :any do
+        respond do
+          body "Something something"
+        end
+      end
+    end
 
-  #   input = core.create_input
-  #   input.source = :test_source
-  #   input.raw_input_prop = "input_hey"
+        # Using lambda to insert into hook and use tests inside of it
+    check_for_input_baked = lambda do |inp|
+      expect(inp.forbidden_input_prop).to be_nil
+    end
 
-  #   output = nil
+    core.hooks.attach :input_before_router do |input|
+      check_for_input_baked.call input
+    end
 
-  #   core.router.output_ready do |o|
-  #     output = o
-  #   end
+    input = core.create_input
+    input.source = :test_source
+    input.raw_input_prop = "input_hey"
 
-  #   core.router.consume_input input
+    output = nil
 
-  #   expect(output).not_to be_nil
-  # end
+    core.router.output_ready do |o|
+      output = o
+    end
+
+    core.router.consume_input input
+
+    expect(output.forbidden_output_prop).to be_nil
+  end
 end

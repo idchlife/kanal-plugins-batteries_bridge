@@ -17,6 +17,7 @@ module Kanal
           super
 
           @bridges = []
+          @fail_gracefully = true
         end
 
         def name
@@ -33,8 +34,19 @@ module Kanal
 
           return if @bridges.include? bridge
 
+          bridge.fail_gracefully = @fail_gracefully
+
           @bridges << bridge
           self
+        end
+
+        #
+        # When bridge converter raises an error, raise it instead of swallowing (logs will be written in both cases)
+        #
+        # @return [void] <description>
+        #
+        def fail_loud
+          @fail_gracefully = false
         end
 
         #

@@ -14,6 +14,8 @@ module Kanal
 
           attr_reader :core_hooks
 
+          attr_writer :fail_gracefully
+
           # Struct for using in param converters
           ParamConverter = Struct.new("ParamConverter", :from_param, :to_param, :block)
 
@@ -32,15 +34,6 @@ module Kanal
           #
           def setup
             raise NotImplementedError
-          end
-
-          #
-          # When converter raises an error, raise it instead of swallowing (logs will be written in both cases)
-          #
-          # @return [void] <description>
-          #
-          def fail_loud
-            @fail_gracefully = false
           end
 
           protected :core_hooks
@@ -85,28 +78,33 @@ module Kanal
           private
 
           def attach_hooks
-            @core_hooks.attach :input_before_router do |input|
-              if input.source == @source
-                @input_converters.each do |converter|
-                  next if input.try(converter.from_param).nil?
+            _source = @source
+            _input_converters = @input_converters
+            _logger = logger
 
-                  input.send(converter.to_param + "=", converter.block.call(input.try(converter.from_param)))
+            @core_hooks.attach :input_before_router do |input|
+              if input.source == _source
+                _input_converters.each do |converter|
+                  next if input.send(converter.from_param).nil?
+
+                  input.send("#{converter.to_param}=", converter.block.call(input.send(converter.from_param)))
                 rescue Exception => e
-                  logger.error "BatteriesBridge input param converter #{self.class} tried to convert #{converter.from_param} to #{converter.to_param} and experienced an error: #{e}"
+                  _logger.error "BatteriesBridge input param converter #{self.class} tried to convert #{converter.from_param} to #{converter.to_param} and experienced an error: #{e}"
 
                   raise unless @fail_gracefully
                 end
               end
             end
 
-            @core_hooks.attach :output_before_returned do |input, _output|
-              if input.source == @source
-                @output_converters.each do |converter|
-                  next if output.try(converter.from_param).nil?
+            _output_converters = @output_converters
+            @core_hooks.attach :output_before_returned do |input, output|
+              if input.source == _source
+                _output_converters.each do |converter|
+                  next if output.send(converter.from_param).nil?
 
-                  output.send(converter.to_param + "=", converter.block.call(output.try(converter.from_param)))
+                  output.send("#{converter.to_param}=", converter.block.call(output.send(converter.from_param)))
                 rescue Exception => e
-                  logger.error "BatteriesBridge output param converter #{self.class} tried to convert #{converter.from_param} to #{converter.to_param} and experienced an error: #{e}"
+                  _logger.error "BatteriesBridge output param converter #{self.class} tried to convert #{converter.from_param} to #{converter.to_param} and experienced an error: #{e}"
 
                   raise unless @fail_gracefully
                 end

@@ -16,7 +16,7 @@ class IntegrationTestBridge < Kanal::Plugins::BatteriesBridge::Bridges::Bridge
   end
 end
 
-class IntegrationTestBridgeB < Kanal::Plugins::BatteriesBridge::Bridges::Bridge
+class IntegrationTestBridgeToAvoid < Kanal::Plugins::BatteriesBridge::Bridges::Bridge
   def setup
     require_source :other_source
 
@@ -67,6 +67,7 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::BatteriesBridgePlugin do
     bb_plugin = Kanal::Plugins::BatteriesBridge::BatteriesBridgePlugin.new
 
     bb_plugin.add_bridge IntegrationTestBridge.new
+    bb_plugin.fail_loud
 
     core.register_plugin bb_plugin
 
@@ -74,8 +75,19 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::BatteriesBridgePlugin do
       on :flow, :any do
         respond do
           body "Something something"
+
+          raw_output_prop "val123"
         end
       end
+    end
+
+    # Using lambda to insert into hook and use tests inside of it
+    check_for_input_baked = lambda do |inp|
+      expect(inp.baked_input_prop).to eq "input_hey_input"
+    end
+
+    core.hooks.attach :input_before_router do |input|
+      check_for_input_baked.call input
     end
 
     input = core.create_input
@@ -91,5 +103,51 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::BatteriesBridgePlugin do
     core.router.consume_input input
 
     expect(output).not_to be_nil
- end
+    expect(output.baked_output_prop).to eq "val123_output"
+  end
+
+  # it "calls only suited :source bridges" do
+  #   core = Kanal::Core::Core.new
+
+  #   core.register_input_parameter :raw_input_prop
+  #   core.register_input_parameter :baked_input_prop
+
+  #   core.register_output_parameter :raw_output_prop
+  #   core.register_output_parameter :baked_output_prop
+
+  #   core.router.default_response do
+  #     body "Default response"
+  #   end
+
+  #   core.register_plugin Kanal::Plugins::Batteries::BatteriesPlugin.new
+
+  #   bb_plugin = Kanal::Plugins::BatteriesBridge::BatteriesBridgePlugin.new
+
+  #   bb_plugin.add_bridge IntegrationTestBridge.new
+  #   bb_plugin.add_bridge IntegrationTestBridgeToAvoid.new
+
+  #   core.register_plugin bb_plugin
+
+  #   core.router.configure do
+  #     on :flow, :any do
+  #       respond do
+  #         body "Something something"
+  #       end
+  #     end
+  #   end
+
+  #   input = core.create_input
+  #   input.source = :test_source
+  #   input.raw_input_prop = "input_hey"
+
+  #   output = nil
+
+  #   core.router.output_ready do |o|
+  #     output = o
+  #   end
+
+  #   core.router.consume_input input
+
+  #   expect(output).not_to be_nil
+  # end
 end

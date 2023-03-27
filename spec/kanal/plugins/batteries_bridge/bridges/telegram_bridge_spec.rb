@@ -9,7 +9,7 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
 
     core.register_plugin Kanal::Plugins::Batteries::BatteriesPlugin.new
 
-    # Old version of kanal without document parameter in batteries used
+    # TODO: Old version of kanal without document parameter in batteries used
     # Instead kanal provides file parameter - which is obsolete
     core.register_input_parameter :document
     core.register_output_parameter :document

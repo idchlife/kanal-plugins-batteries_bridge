@@ -11,6 +11,8 @@ module Kanal
         #
         class Bridge
           include Kanal::Core::Logging
+          # TODO: this line is obsolete, remove it
+          include Kanal::Core::Logging::Logger
 
           attr_reader :core_hooks
 

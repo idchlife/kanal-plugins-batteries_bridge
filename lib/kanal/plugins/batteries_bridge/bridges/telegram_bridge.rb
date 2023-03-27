@@ -26,6 +26,8 @@ module Kanal
               Attachment.new val
             end
 
+            # TODO: conversion for input video and document
+
             output_convert :image, :tg_image_path do |val|
               val
             end
@@ -34,11 +36,17 @@ module Kanal
               val
             end
 
+            # TODO: conversion for output video
+
             output_convert :body, :tg_text do |val|
               val
             end
 
-            output_convert :file, :tg_document_path do |val|
+            output_convert :document, :tg_document_path do |val|
+              val
+            end
+
+            output_convert :keyboard, :tg_reply_markup do |val|
               val
             end
           end

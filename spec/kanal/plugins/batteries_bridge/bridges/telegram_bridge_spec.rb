@@ -31,7 +31,7 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
     core.register_output_parameter :tg_video_path
     core.register_output_parameter :tg_document_path
 
-    # TODO: kanal of version 0.4.1 doesn't have button_pressed parameter in batteries
+    # TODO: kanal of version 0.4.1 doesn't have button_pressed condition pack in batteries
     # TODO: Remove condition pack below on Kanal update
     core.add_condition_pack :button_pressed do
       add_condition :contains do

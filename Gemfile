@@ -7,7 +7,7 @@ gemspec
 
 gem "rake", "~> 13.0"
 
-gem "kanal", ">= 0.4.1"
+gem "kanal", ">= 0.4.2"
 
 group :development do
   gem "rubocop", "~> 1.21"

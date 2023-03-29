@@ -13,12 +13,14 @@ GEM
     e2mmap (0.1.0)
     jaro_winkler (1.5.4)
     json (2.6.3)
-    kanal (0.4.1)
+    kanal (0.4.2)
     kramdown (2.4.0)
       rexml
     kramdown-parser-gfm (1.1.0)
       kramdown (~> 2.0)
     nokogiri (1.14.2-x86_64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.14.2-x86_64-linux)
       racc (~> 1.4)
     parallel (1.22.1)
     parser (3.2.1.1)
@@ -82,9 +84,10 @@ GEM
 
 PLATFORMS
   x86_64-darwin-21
+  x86_64-linux
 
 DEPENDENCIES
-  kanal (>= 0.4.1)
+  kanal (>= 0.4.2)
   kanal-plugins-batteries_bridge!
   rake (~> 13.0)
   rspec (~> 3.0)
@@ -94,4 +97,4 @@ DEPENDENCIES
   yard
 
 BUNDLED WITH
-   2.3.19
+   2.4.5

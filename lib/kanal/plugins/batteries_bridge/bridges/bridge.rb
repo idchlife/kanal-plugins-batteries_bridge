@@ -11,7 +11,8 @@ module Kanal
         #
         class Bridge
           include Kanal::Core::Logging
-          # TODO: this line is obsolete, remove it
+          # TODO: Kanal of version 0.4.1 uses this line to get logger method
+          # TODO: New Kanal release will have shortcut for it so this line will be redundant
           include Kanal::Core::Logging::Logger
 
           attr_reader :core_hooks

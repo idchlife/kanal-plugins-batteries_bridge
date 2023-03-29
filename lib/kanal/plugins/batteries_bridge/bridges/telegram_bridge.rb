@@ -18,7 +18,7 @@ module Kanal
               val
             end
 
-            input_convert :tg_button_pressed, :button_pressed do |val|
+            input_convert :tg_button, :button do |val|
               val
             end
 

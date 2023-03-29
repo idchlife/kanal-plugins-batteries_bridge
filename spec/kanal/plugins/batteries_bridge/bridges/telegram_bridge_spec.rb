@@ -9,20 +9,20 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
 
     core.register_plugin Kanal::Plugins::Batteries::BatteriesPlugin.new
 
-    # TODO: kanal of version 0.4.1 doesn't have document, video, button_pressed parameters
+    # TODO: kanal of version 0.4.1 doesn't have document, video, button parameters
     # TODO: Remove parameters below on Kanal update
     core.register_input_parameter :document, readonly: true
     core.register_output_parameter :document, readonly: true
     core.register_input_parameter :video, readonly: true
     core.register_output_parameter :video, readonly: true
-    core.register_input_parameter :button_pressed, readonly: true
+    core.register_input_parameter :button, readonly: true
 
     core.register_input_parameter :tg_text, readonly: true
     core.register_input_parameter :tg_image_link, readonly: true
     core.register_input_parameter :tg_audio_link, readonly: true
     core.register_input_parameter :tg_video_link, readonly: true
     core.register_input_parameter :tg_document_link, readonly: true
-    core.register_input_parameter :tg_button_pressed
+    core.register_input_parameter :tg_button
 
     core.register_output_parameter :tg_text
     core.register_output_parameter :tg_reply_markup
@@ -33,10 +33,10 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
 
     # TODO: kanal of version 0.4.1 doesn't have button_pressed condition pack in batteries
     # TODO: Remove condition pack below on Kanal update
-    core.add_condition_pack :button_pressed do
-      add_condition :contains do
+    core.add_condition_pack :button do
+      add_condition :pressed do
         met? do |input, _core, _argument|
-          input.button_pressed.include?(_argument)
+          input.button.include?(_argument)
         end
       end
     end
@@ -66,7 +66,7 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
         end
       end
 
-      on :button_pressed, contains: "Clicked button" do
+      on :button, pressed: "Clicked button" do
         respond do
           body "You clicked on a button"
         end
@@ -113,7 +113,7 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
     expect(output.tg_reply_markup.to_a).to eq [["First", "Second"]]
 
     input_conversion_check = lambda do |inp|
-      expect(inp.button_pressed).to eq "Clicked button"
+      expect(inp.button).to eq "Clicked button"
     end
 
     core.hooks.attach :input_before_router do |input|
@@ -122,7 +122,7 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
 
     input = core.create_input
     input.source = :telegram
-    input.tg_button_pressed = "Clicked button"
+    input.tg_button = "Clicked button"
     core.router.consume_input input
     expect(output.body).to eq "You clicked on a button"
   end

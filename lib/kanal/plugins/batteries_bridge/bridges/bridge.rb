@@ -10,9 +10,6 @@ module Kanal
         # Base class for bridges. All bridges should be derived from this class
         #
         class Bridge
-          include Kanal::Core::Logging
-          # TODO: Kanal of version 0.4.1 uses this line to get logger method
-          # TODO: New Kanal release will have shortcut for it so this line will be redundant
           include Kanal::Core::Logging::Logger
 
           attr_reader :core_hooks

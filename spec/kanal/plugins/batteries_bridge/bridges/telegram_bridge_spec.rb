@@ -15,14 +15,14 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
     core.register_output_parameter :document, readonly: true
     core.register_input_parameter :video, readonly: true
     core.register_output_parameter :video, readonly: true
-    core.register_input_parameter :button, readonly: true
+    core.register_input_parameter :button_pressed, readonly: true
 
     core.register_input_parameter :tg_text, readonly: true
     core.register_input_parameter :tg_image_link, readonly: true
     core.register_input_parameter :tg_audio_link, readonly: true
     core.register_input_parameter :tg_video_link, readonly: true
     core.register_input_parameter :tg_document_link, readonly: true
-    core.register_input_parameter :tg_button
+    core.register_input_parameter :tg_button_pressed
 
     core.register_output_parameter :tg_text
     core.register_output_parameter :tg_reply_markup
@@ -35,8 +35,10 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
     # TODO: Remove condition pack below on Kanal update
     core.add_condition_pack :button do
       add_condition :pressed do
+        with_argument
+
         met? do |input, _core, _argument|
-          input.button.include?(_argument)
+          input.button == _argument
         end
       end
     end
@@ -53,7 +55,7 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
     core.register_plugin bb_plugin
 
     core.router.configure do
-      on :body, contains: "Test" do
+      on :flow, :any do
         respond do
           body "Output text"
           image "/some/path/to/image.jpg"
@@ -63,12 +65,6 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
           keyboard.build do
             row "First", "Second"
           end
-        end
-      end
-
-      on :button, pressed: "Clicked button" do
-        respond do
-          body "You clicked on a button"
         end
       end
     end
@@ -83,6 +79,7 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
       expect(inp.video.url).to eq "https://something.com/video.mp4"
       expect(inp.document.class).to eq Kanal::Plugins::Batteries::Attachments::Attachment
       expect(inp.document.url).to eq "https://something.com/document.doc"
+      expect(inp.button_pressed).to eq "Button pressed"
     end
 
     core.hooks.attach :input_before_router do |input|
@@ -102,6 +99,7 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
     input.tg_audio_link = "https://something.com/audio.mp3"
     input.tg_video_link = "https://something.com/video.mp4"
     input.tg_document_link = "https://something.com/document.doc"
+    input.tg_button_pressed = "Button pressed"
 
     core.router.consume_input input
 
@@ -111,20 +109,6 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
     expect(output.tg_video_path).to eq "/some/path/to/video.mp4"
     expect(output.tg_document_path).to eq "/some/path/to/document.doc"
     expect(output.tg_reply_markup.to_a).to eq [["First", "Second"]]
-
-    input_conversion_check = lambda do |inp|
-      expect(inp.button).to eq "Clicked button"
-    end
-
-    core.hooks.attach :input_before_router do |input|
-      input_conversion_check.call input
-    end
-
-    input = core.create_input
-    input.source = :telegram
-    input.tg_button = "Clicked button"
-    core.router.consume_input input
-    expect(output.body).to eq "You clicked on a button"
   end
 end
 

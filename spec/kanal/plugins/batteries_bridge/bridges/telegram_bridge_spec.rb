@@ -9,14 +9,6 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
 
     core.register_plugin Kanal::Plugins::Batteries::BatteriesPlugin.new
 
-    # TODO: kanal of version 0.4.1 doesn't have document, video, button parameters
-    # TODO: Remove parameters below on Kanal update
-    core.register_input_parameter :document, readonly: true
-    core.register_output_parameter :document, readonly: true
-    core.register_input_parameter :video, readonly: true
-    core.register_output_parameter :video, readonly: true
-    core.register_input_parameter :button_pressed, readonly: true
-
     core.register_input_parameter :tg_text, readonly: true
     core.register_input_parameter :tg_image_link, readonly: true
     core.register_input_parameter :tg_audio_link, readonly: true

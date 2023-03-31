@@ -18,6 +18,10 @@ module Kanal
               val
             end
 
+            input_convert :tg_username, :username do |val|
+              val
+            end
+
             input_convert :tg_button_pressed, :button_pressed do |val|
               val
             end

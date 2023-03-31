@@ -10,6 +10,7 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
     core.register_plugin Kanal::Plugins::Batteries::BatteriesPlugin.new
 
     core.register_input_parameter :tg_text, readonly: true
+    core.register_input_parameter :tg_username, readonly: true
     core.register_input_parameter :tg_image_link, readonly: true
     core.register_input_parameter :tg_audio_link, readonly: true
     core.register_input_parameter :tg_video_link, readonly: true
@@ -51,6 +52,7 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
 
     input_conversion_check = lambda do |inp|
       expect(inp.body).to eq "Test"
+      expect(inp.username).to eq "Test username"
       expect(inp.image.class).to eq Kanal::Plugins::Batteries::Attachments::Attachment
       expect(inp.image.url).to eq "https://something.com/image.jpg"
       expect(inp.audio.class).to eq Kanal::Plugins::Batteries::Attachments::Attachment
@@ -75,6 +77,7 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
     input = core.create_input
     input.source = :telegram
     input.tg_text = "Test"
+    input.tg_username = "Test username"
     input.tg_image_link = "https://something.com/image.jpg"
     input.tg_audio_link = "https://something.com/audio.mp3"
     input.tg_video_link = "https://something.com/video.mp4"

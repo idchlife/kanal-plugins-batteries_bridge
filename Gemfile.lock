@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     kanal-plugins-batteries_bridge (0.1.0)
+      kanal (>= 0.4.2)
 
 GEM
   remote: https://rubygems.org/

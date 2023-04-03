@@ -3,6 +3,7 @@
 require "kanal"
 require "kanal/plugins/batteries/attachments/attachment"
 require_relative "./bridge"
+require "telegram/bot"
 
 module Kanal
   module Plugins
@@ -62,8 +63,22 @@ module Kanal
               val
             end
 
-            output_convert :keyboard, :tg_reply_markup do |val|
-              val
+            output_convert :keyboard, :tg_reply_markup do |keyboard_object|
+              nil if keyboard_object.nil? || !keyboard_object.to_a.count.positive?
+
+              inline_keyboard = []
+
+              keyboard_object.to_a.each do |row_of_button_names|
+                row_of_buttons = []
+
+                row_of_button_names.each do |button_name|
+                  row_of_buttons << Telegram::Bot::Types::InlineKeyboardButton.new(text: button_name, callback_data: button_name)
+                end
+
+                inline_keyboard << row_of_buttons
+              end
+
+              Telegram::Bot::Types::InlineKeyboardMarkup.new inline_keyboard: inline_keyboard
             end
           end
         end

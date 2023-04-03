@@ -20,6 +20,9 @@ Gem::Specification.new do |spec|
   spec.metadata["source_code_uri"] = "https://github.com/idchlife/kanal-plugins-batteries_bridge"
   spec.metadata["changelog_uri"] = "https://github.com/idchlife/kanal-plugins-batteries_bridge/CHANGELOG.md"
 
+  spec.add_dependency "kanal", ">= 0.4.2"
+  spec.add_dependency "kanal-interfaces-telegram", ">= 0.3.4"
+
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
   spec.files = Dir.chdir(__dir__) do

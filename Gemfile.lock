@@ -3,6 +3,7 @@ PATH
   specs:
     kanal-plugins-batteries_bridge (0.1.0)
       kanal (>= 0.4.2)
+      kanal-interfaces-telegram (>= 0.3.4)
 
 GEM
   remote: https://rubygems.org/
@@ -127,8 +128,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  kanal (>= 0.4.2)
-  kanal-interfaces-telegram (>= 0.3.4)
   kanal-plugins-batteries_bridge!
   rake (~> 13.0)
   rspec (~> 3.0)

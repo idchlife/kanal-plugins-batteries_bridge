@@ -9,6 +9,8 @@ gem "rake", "~> 13.0"
 
 gem "kanal", ">= 0.4.2"
 
+gem "kanal-interfaces-telegram", ">= 0.3.4"
+
 group :development do
   gem "rubocop", "~> 1.21"
   gem "ruby-debug-ide", "~> 0.7.3"

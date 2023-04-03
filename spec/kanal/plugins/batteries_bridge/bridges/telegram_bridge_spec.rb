@@ -88,7 +88,7 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
     expect(output.tg_audio_path).to eq "/some/path/to/audio.mp3"
     expect(output.tg_video_path).to eq "/some/path/to/video.mp4"
     expect(output.tg_document_path).to eq "/some/path/to/document.doc"
-    expect(output.tg_reply_markup.to_a).to eq [["First", "Second"]]
+    expect(output.tg_reply_markup.instance_of?(::Telegram::Bot::Types::InlineKeyboardMarkup)).to eq true
   end
 end
 

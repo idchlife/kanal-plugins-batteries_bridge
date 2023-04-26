@@ -101,8 +101,7 @@ module Kanal
               if input.source == _source
                 _output_converters.each do |converter|
                   next if output.send(converter.from_param).nil?
-
-                  output.send("#{converter.to_param}=", converter.block.call(output.send(converter.from_param)))
+                  output.send("#{converter.to_param}=", converter.block.call(output.send(converter.from_param), input, output))
                 rescue Exception => e
                   _logger.error "BatteriesBridge output param converter #{self.class} tried to convert #{converter.from_param} to #{converter.to_param} and experienced an error: #{e}"
 

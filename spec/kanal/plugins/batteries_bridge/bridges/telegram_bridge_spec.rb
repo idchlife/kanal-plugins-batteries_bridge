@@ -7,6 +7,8 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
   it "successfully converts parameters to telegram bridge parameters" do
     core = Kanal::Core::Core.new
 
+    core.logger.add_logger Logger.new STDOUT
+
     core.register_plugin Kanal::Plugins::Batteries::BatteriesPlugin.new
 
     core.register_input_parameter :tg_text, readonly: true
@@ -36,7 +38,7 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
     core.register_plugin bb_plugin
 
     core.router.configure do
-      on :flow, :any do
+      on :body, contains: "Test" do
         respond do
           body "Output text"
           image "/some/path/to/image.jpg"
@@ -46,6 +48,16 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
           keyboard.build do
             row "First", "Second"
           end
+        end
+      end
+
+      on :body, contains: "Specifics" do
+        respond do
+          keyboard.build do
+            row "First", "Second"
+          end
+
+          specifics.add :tg_reply_keyboard, true
         end
       end
     end
@@ -92,6 +104,20 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
     expect(output.tg_video_path).to eq "/some/path/to/video.mp4"
     expect(output.tg_document_path).to eq "/some/path/to/document.doc"
     expect(output.tg_reply_markup.instance_of?(::Telegram::Bot::Types::InlineKeyboardMarkup)).to eq true
+
+    input_conversion_check = lambda do |inp|
+      expect(inp.body).to eq "Specifics"
+    end
+
+    core.hooks.attach :input_before_router do |input|
+      input_conversion_check.call input
+    end
+
+    input = core.create_input
+    input.tg_text = "Specifics"
+    input.source = :telegram
+    core.router.consume_input input
+    expect(output.tg_reply_markup.instance_of?(::Telegram::Bot::Types::ReplyKeyboardMarkup)).to eq true
   end
 end
 

@@ -66,21 +66,7 @@ module Kanal
             output_convert :keyboard, :tg_reply_markup do |keyboard_object, input, output|
               nil if keyboard_object.nil? || !keyboard_object.to_a.count.positive?
 
-              if output.specifics.has?(:tg_reply_keyboard) == false || output.specifics.get(:tg_reply_keyboard) == false
-                inline_keyboard = []
-
-                keyboard_object.to_a.each do |row_of_button_names|
-                  row_of_buttons = []
-
-                  row_of_button_names.each do |button_name|
-                    row_of_buttons << Telegram::Bot::Types::InlineKeyboardButton.new(text: button_name, callback_data: button_name)
-                  end
-
-                  inline_keyboard << row_of_buttons
-                end
-
-                Telegram::Bot::Types::InlineKeyboardMarkup.new inline_keyboard: inline_keyboard
-              else
+              if output.specifics.get :tg_reply_keyboard
                 regular_keyboard = []
 
                 keyboard_object.to_a.each do |row_of_button_names|
@@ -94,6 +80,20 @@ module Kanal
                 end
 
                 Telegram::Bot::Types::ReplyKeyboardMarkup.new keyboard: regular_keyboard
+              else
+                inline_keyboard = []
+
+                keyboard_object.to_a.each do |row_of_button_names|
+                  row_of_buttons = []
+
+                  row_of_button_names.each do |button_name|
+                    row_of_buttons << Telegram::Bot::Types::InlineKeyboardButton.new(text: button_name, callback_data: button_name)
+                  end
+
+                  inline_keyboard << row_of_buttons
+                end
+
+                Telegram::Bot::Types::InlineKeyboardMarkup.new inline_keyboard: inline_keyboard
               end
             end
           end

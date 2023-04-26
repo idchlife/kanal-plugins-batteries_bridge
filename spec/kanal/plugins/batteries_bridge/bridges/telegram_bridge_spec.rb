@@ -7,7 +7,7 @@ RSpec.describe Kanal::Plugins::BatteriesBridge::Bridges::TelegramBridge do
   it "successfully converts parameters to telegram bridge parameters" do
     core = Kanal::Core::Core.new
 
-    core.logger.add_logger Logger.new STDOUT
+    # core.logger.add_logger Logger.new STDOUT
 
     core.register_plugin Kanal::Plugins::Batteries::BatteriesPlugin.new
 
